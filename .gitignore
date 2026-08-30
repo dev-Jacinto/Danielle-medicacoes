@@ -1,4 +1,4 @@
-i# Dependências instaladas (geradas pelo npm install)
+# Dependências instaladas (geradas pelo npm install)
 node_modules/
 
 # Variáveis de ambiente e segredos
