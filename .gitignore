@@ -1,0 +1,25 @@
+i# Dependências instaladas (geradas pelo npm install)
+node_modules/
+
+# Variáveis de ambiente e segredos
+.env
+.env.local
+
+# Banco de dados local
+*.sqlite
+*.sqlite3
+*.db
+
+# Build de produção
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Arquivos do sistema operacional e editor
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/
