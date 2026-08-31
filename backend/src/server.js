@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const initDb = require('./config/initDb');
 const authRoutes = require('./routes/authRoutes');
+const medicamentoRoutes = require('./routes/medicamentoRoutes');
+
 
 // Cria as tabelas do banco de dados (se ainda não existirem)
 initDb();
@@ -15,6 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 // Rotas
+app.use('/api/medicamentos', medicamentoRoutes);
 app.use('/api/auth', authRoutes);
 
 // Rota de teste (vamos substituir pelas rotas de verdade nas próximas partes)
