@@ -7,7 +7,23 @@ const router = express.Router();
 
 router.use(autenticar);
 
+// GET /api/horarios
+// Lista TODOS os horários ativos do administrador logado, com nome e dose
+// do medicamento já junto. Usado pelo sistema de alarme para saber o que
+// falta tomar e quando.
+router.get('/', (req, res) => {
+  try {
+    const horarios = Horario.listarAtivosPorAdministrador(req.administrador.id);
+    res.json({ horarios });
+  } catch (erro) {
+    console.error(erro);
+    res.status(500).json({ erro: 'Erro ao listar horários.' });
+  }
+});
 
+// POST /api/horarios
+// Adiciona um horário a um medicamento existente
+// Body esperado: { medicamento_id, horario } (horario no formato "HH:MM")
 router.post('/', (req, res) => {
   try {
     const { medicamento_id, horario } = req.body;
@@ -16,6 +32,7 @@ router.post('/', (req, res) => {
       return res.status(400).json({ erro: 'medicamento_id e horario são obrigatórios.' });
     }
 
+    // Confirma que o medicamento existe e pertence ao administrador logado
     const medicamento = Medicamento.buscarPorId(medicamento_id);
     if (!medicamento || medicamento.administrador_id !== req.administrador.id) {
       return res.status(404).json({ erro: 'Medicamento não encontrado.' });
@@ -29,7 +46,8 @@ router.post('/', (req, res) => {
   }
 });
 
-
+// GET /api/horarios/medicamento/:medicamentoId
+// Lista os horários de um medicamento específico
 router.get('/medicamento/:medicamentoId', (req, res) => {
   try {
     const { medicamentoId } = req.params;
@@ -47,8 +65,8 @@ router.get('/medicamento/:medicamentoId', (req, res) => {
   }
 });
 
-
-
+// DELETE /api/horarios/:id
+// Remove um horário
 router.delete('/:id', (req, res) => {
   try {
     const { id } = req.params;
