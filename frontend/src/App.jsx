@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Cadastro from './pages/Cadastro';
 import Painel from './pages/Painel';
+import RotaProtegida from './components/RotaProtegida';
 
 function App() {
   return (
@@ -10,7 +11,14 @@ function App() {
       <Route path="/" element={<Navigate to="/login" />} />
       <Route path="/login" element={<Login />} />
       <Route path="/cadastro" element={<Cadastro />} />
-      <Route path="/painel" element={<Painel />} />
+      <Route
+        path="/painel"
+        element={
+          <RotaProtegida>
+            <Painel />
+          </RotaProtegida>
+        }
+      />
     </Routes>
   );
 }
