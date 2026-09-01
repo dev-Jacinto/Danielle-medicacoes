@@ -7,10 +7,28 @@ import {
   excluirMedicamento,
 } from '../services/medicamentoService';
 import {
+  listarHorariosAtivos,
   listarHorariosDoMedicamento,
   adicionarHorario,
   excluirHorario,
 } from '../services/horarioService';
+import Alarme from '../components/Alarme';
+
+// Subtrai minutos de um horário no formato "HH:MM" e devolve outro "HH:MM"
+function subtrairMinutos(horaMinuto, minutos) {
+  const [h, m] = horaMinuto.split(':').map(Number);
+  let totalMinutos = h * 60 + m - minutos;
+  if (totalMinutos < 0) totalMinutos += 24 * 60; // não deixa passar da meia-noite pra trás
+  const novaHora = String(Math.floor(totalMinutos / 60)).padStart(2, '0');
+  const novoMinuto = String(totalMinutos % 60).padStart(2, '0');
+  return `${novaHora}:${novoMinuto}`;
+}
+
+// Chave usada no localStorage para lembrar quais alarmes já foram fechados hoje
+function chaveAlarmeFechado(horarioId) {
+  const hoje = new Date().toISOString().slice(0, 10); // ex: "2026-08-31"
+  return `alarme-fechado-${horarioId}-${hoje}`;
+}
 
 function Painel() {
   const navigate = useNavigate();
@@ -27,9 +45,49 @@ function Painel() {
   // Campo do formulário de novo horário (um por medicamento, controlado pelo id)
   const [novoHorario, setNovoHorario] = useState({});
 
+  // Guarda o alarme que deve aparecer na tela agora (ou null, se nenhum)
+  const [alarmeAtivo, setAlarmeAtivo] = useState(null);
+
   useEffect(() => {
     carregarMedicamentos();
   }, []);
+
+  // A cada 20 segundos, verifica se algum horário está a 5 minutos de distância
+  useEffect(() => {
+    verificarAlarmes(); // roda uma vez assim que a página abre
+    const intervalo = setInterval(verificarAlarmes, 20000);
+    return () => clearInterval(intervalo);
+  }, []);
+
+  async function verificarAlarmes() {
+    // Se já tem um alarme na tela, não verifica de novo (evita trocar o alarme no meio)
+    if (alarmeAtivo) return;
+
+    const horarios = await listarHorariosAtivos();
+
+    const agora = new Date();
+    const horaAtual = `${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')}`;
+
+    for (const horario of horarios) {
+      // Já foi fechado hoje? Pula.
+      if (localStorage.getItem(chaveAlarmeFechado(horario.id))) continue;
+
+      const horaAlarme = subtrairMinutos(horario.horario, 5);
+
+      // Está entre "5 minutos antes" e o horário exato do remédio?
+      if (horaAtual >= horaAlarme && horaAtual <= horario.horario) {
+        setAlarmeAtivo(horario);
+        break; // mostra só um alarme por vez
+      }
+    }
+  }
+
+  function handleFecharAlarme() {
+    if (alarmeAtivo) {
+      localStorage.setItem(chaveAlarmeFechado(alarmeAtivo.id), 'true');
+    }
+    setAlarmeAtivo(null);
+  }
 
   async function carregarMedicamentos() {
     const lista = await listarMedicamentos();
@@ -78,8 +136,16 @@ function Painel() {
   }
 
   return (
-    <div>
-      <header>
+    <>
+      {alarmeAtivo && (
+        <Alarme
+          medicamentoNome={alarmeAtivo.medicamento_nome}
+          dose={alarmeAtivo.dose}
+          onFechar={handleFecharAlarme}
+        />
+      )}
+      <div>
+        <header>
         <h1>Danielle Medicações</h1>
         <div>
           <span>{administrador?.nome} ({administrador?.email})</span>
@@ -150,6 +216,7 @@ function Painel() {
         ))}
       </section>
     </div>
+    </>
   );
 }
 

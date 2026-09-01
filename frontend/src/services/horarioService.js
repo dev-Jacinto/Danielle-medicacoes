@@ -1,5 +1,10 @@
 import api from './api';
 
+export async function listarHorariosAtivos() {
+  const resposta = await api.get('/horarios');
+  return resposta.data.horarios;
+}
+
 export async function listarHorariosDoMedicamento(medicamentoId) {
   const resposta = await api.get(`/horarios/medicamento/${medicamentoId}`);
   return resposta.data.horarios;
