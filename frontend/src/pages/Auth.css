@@ -1,0 +1,134 @@
+.auth-pagina {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Painel esquerdo: sólido, com o nome do app em destaque */
+.auth-painel-marca {
+  flex: 1;
+  background: var(--cor-destaque);
+  color: var(--cor-branco);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem;
+}
+
+.auth-painel-marca svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.auth-painel-marca h1 {
+  font-size: 3rem;
+  line-height: 1.1;
+  max-width: 380px;
+}
+
+.auth-painel-marca p {
+  margin-top: 1.5rem;
+  max-width: 340px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+}
+
+/* Painel direito: o formulário em si */
+.auth-painel-formulario {
+  flex: 1;
+  background: var(--cor-branco);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.auth-formulario {
+  width: 100%;
+  max-width: 360px;
+}
+
+.auth-formulario h2 {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.auth-formulario > p {
+  color: var(--cor-texto-suave);
+  margin-bottom: 2rem;
+}
+
+.auth-campo {
+  margin-bottom: 1.25rem;
+}
+
+.auth-campo label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+
+.auth-campo input {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--cor-borda);
+  border-radius: 6px;
+  background: var(--cor-fundo);
+  transition: border-color 0.15s ease;
+}
+
+.auth-campo input:focus {
+  outline: none;
+  border-color: var(--cor-destaque);
+}
+
+.auth-botao {
+  width: 100%;
+  padding: 0.8rem;
+  margin-top: 0.5rem;
+  border: none;
+  border-radius: 6px;
+  background: var(--cor-destaque);
+  color: var(--cor-branco);
+  font-weight: 500;
+  transition: background 0.15s ease;
+}
+
+.auth-botao:hover:not(:disabled) {
+  background: var(--cor-destaque-escuro);
+}
+
+.auth-botao:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-erro {
+  color: var(--cor-erro);
+  font-size: 0.9rem;
+  margin: 0.75rem 0 0;
+}
+
+.auth-rodape {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--cor-texto-suave);
+}
+
+/* Em telas estreitas, empilha os painéis em vez de dividir lado a lado */
+@media (max-width: 800px) {
+  .auth-pagina {
+    flex-direction: column;
+  }
+
+  .auth-painel-marca {
+    padding: 2.5rem 2rem;
+  }
+
+  .auth-painel-marca h1 {
+    font-size: 2rem;
+  }
+}
