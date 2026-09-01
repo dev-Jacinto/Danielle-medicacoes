@@ -13,6 +13,7 @@ import {
   excluirHorario,
 } from '../services/horarioService';
 import Alarme from '../components/Alarme';
+import './Painel.css';
 
 // Subtrai minutos de um horário no formato "HH:MM" e devolve outro "HH:MM"
 function subtrairMinutos(horaMinuto, minutos) {
@@ -144,18 +145,19 @@ function Painel() {
           onFechar={handleFecharAlarme}
         />
       )}
-      <div>
-        <header>
+      <div className="painel-pagina">
+        <header className="painel-header">
         <h1>Danielle Medicações</h1>
-        <div>
+        <div className="painel-usuario">
           <span>{administrador?.nome} ({administrador?.email})</span>
           <button onClick={handleLogout}>Sair</button>
         </div>
       </header>
 
+      <div className="painel-conteudo">
       <section>
         <h2>Novo medicamento</h2>
-        <form onSubmit={handleCriarMedicamento}>
+        <form onSubmit={handleCriarMedicamento} className="form-medicamento">
           <input
             type="text"
             placeholder="Nome do medicamento"
@@ -181,23 +183,27 @@ function Painel() {
 
       <section>
         <h2>Medicamentos cadastrados</h2>
-        {medicamentos.length === 0 && <p>Nenhum medicamento cadastrado ainda.</p>}
+        {medicamentos.length === 0 && <p className="texto-vazio">Nenhum medicamento cadastrado ainda.</p>}
 
+        <div className="lista-medicamentos">
         {medicamentos.map((medicamento) => (
-          <div key={medicamento.id} style={{ border: '1px solid #ccc', margin: '10px 0', padding: '10px' }}>
-            <h3>{medicamento.nome} {medicamento.dose && `- ${medicamento.dose}`}</h3>
-            {medicamento.observacoes && <p>{medicamento.observacoes}</p>}
+          <div key={medicamento.id} className="medicamento-card">
+            <h3>
+              {medicamento.nome}
+              {medicamento.dose && <span className="dose">{medicamento.dose}</span>}
+            </h3>
+            {medicamento.observacoes && <p className="observacoes">{medicamento.observacoes}</p>}
 
-            <ul>
+            <ul className="horarios-lista">
               {(horariosPorMedicamento[medicamento.id] || []).map((horario) => (
-                <li key={horario.id}>
-                  {horario.horario}{' '}
-                  <button onClick={() => handleExcluirHorario(horario.id)}>Remover</button>
+                <li key={horario.id} className="horario-chip">
+                  {horario.horario}
+                  <button onClick={() => handleExcluirHorario(horario.id)}>×</button>
                 </li>
               ))}
             </ul>
 
-            <form onSubmit={(e) => handleAdicionarHorario(e, medicamento.id)}>
+            <form onSubmit={(e) => handleAdicionarHorario(e, medicamento.id)} className="form-horario">
               <input
                 type="time"
                 value={novoHorario[medicamento.id] || ''}
@@ -209,12 +215,14 @@ function Painel() {
               <button type="submit">Adicionar horário</button>
             </form>
 
-            <button onClick={() => handleExcluirMedicamento(medicamento.id)}>
+            <button onClick={() => handleExcluirMedicamento(medicamento.id)} className="botao-excluir-medicamento">
               Excluir medicamento
             </button>
           </div>
         ))}
+        </div>
       </section>
+      </div>
     </div>
     </>
   );
