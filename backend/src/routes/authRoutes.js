@@ -76,4 +76,59 @@ router.get('/me', autenticar, (req, res) => {
   res.json({ administrador: req.administrador });
 });
 
+router.post('/esqueci-senha', (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) return res.status(400).json({ erro: 'Email é obrigatório.' });
+
+      const administrador = Administrador.buscarPorEmail(email);
+      if (!administrador) return res.status(404).json({ erro: 'Email não encontrado.' });
+
+      // Gera um token aleatório único
+      const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
+      // Define que o código expira em 1 hora (3600000 milissegundos)
+      const expiraEm = new Date(Date.now() + 3600000).toISOString();
+
+      Administrador.salvarTokenReset(email, token, expiraEm);
+
+      // SIMULAÇÃO: Imprime o código no console do backend para você testar
+      console.log(`\n--- 📧 CÓDIGO DE RECUPERAÇÃO ---`);
+      console.log(`Para: ${email}`);
+      console.log(`Token: ${token}`);
+      console.log(`------------------------------\n`);
+
+      res.json({ mensagem: 'Se o email existir, um código de recuperação foi enviado.' });
+    } catch (erro) {
+      console.error(erro);
+      res.status(500).json({ erro: 'Erro ao processar solicitação.' });
+    }
+  });
+
+  router.post('/redefinir-senha', (req, res) => {
+    try {
+      const { token, novaSenha } = req.body;
+      if (!token || !novaSenha) return res.status(400).json({ erro: 'Token e nova senha são obrigatórios.' });
+
+      const administrador = Administrador.buscarPorTokenReset(token);
+      if (!administrador) return res.status(400).json({ erro: 'Token inválido ou expirado.' });
+
+      // Verifica se a data atual já passou da data de expiração
+      if (new Date(administrador.reset_token_expiry) < new Date()) {
+        return res.status(400).json({ erro: 'Este token já expirou.' });
+      }
+
+      const nova_senha_hash = bcrypt.hashSync(novaSenha, 10);
+      Administrador.atualizarSenha(administrador.id, nova_senha_hash);
+
+      res.json({ mensagem: 'Senha alterada com sucesso! Agora você pode fazer login.' });
+    } catch (erro) {
+      console.error(erro);
+      res.status(500).json({ erro: 'Erro ao redefinir senha.' });
+    }
+  });
+
+
+
+
 module.exports = router;
